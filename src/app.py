@@ -57,7 +57,7 @@ controls = dbc.Card(
     [
         html.Div(
             [
-                html.Label("Subcategory Cluster Counts"),
+                html.Label("Subcategories"),
                 *[html.Div(
                     [
                         dbc.Label(f"{subcategory}"),
@@ -72,7 +72,7 @@ controls = dbc.Card(
 )
 app.layout = dbc.Container(
     [
-        html.H1("Iris k-means clustering"),
+        html.H1("Succesfactoren tennis test"),
         html.Hr(),
         dbc.Row(
              [
