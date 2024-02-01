@@ -15,8 +15,6 @@ from sklearn import datasets
 from sklearn.cluster import KMeans
 import plotly as px
 
-print(px.colors.qualitative.Set3)
-
 # Replace the existing dataset and related code with your data
 data = {
     'Main_Category': ['Talent',
@@ -33,11 +31,6 @@ data = {
 # Define colors for main categories
 main_category_colors = ['red', 'green', 'purple', 'orange']
 main_categories = ['Talent', 'Mentaliteit', 'Opleiding', 'Familie']
-# subcategories = [f'Subcategory {i+1}' for i in range(15)]
-
-# # Predefined values for 5 main categories, each with 3 subcategories
-# predefined_values = {f'Subcategory {i+1}': 5 for i in range(15)}
-# predefined_values_list = [predefined_values[subcategory] for subcategory in subcategories]
 
 # Create subcategories list and corresponding ranks
 subcategories = data['Sub_Category']
@@ -47,14 +40,9 @@ ranks = data['Rank']
 predefined_values = {subcategory: rank for subcategory, rank in zip(subcategories, ranks)}
 predefined_values_list = [predefined_values[subcategory] for subcategory in subcategories]
 
-# Print the result
-print(predefined_values)
-print(predefined_values_list)
-
 # Convert your data to a DataFrame
 df = pd.DataFrame(data)
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
 
 app = dash.Dash(
     title="SuccesFactorenTennis",
@@ -96,9 +84,8 @@ controls = dbc.Card(
         'padding': '20px 10px',
         'background-color': '#f8f9fa',
         'width': '20%',
-        # 'font-size': '20px',
+        'font-size': '20px',
         'overflowY': 'scroll', 
-        # 'maxHeight': '1250px',
     },
 )
 
@@ -117,18 +104,11 @@ app.layout = dbc.Container(
                         ]),
                         dbc.Row([
                             dbc.Col(
-                                # dbc.Card(
-                                    # [
-                                        # dbc.CardBody(
                                             [
                                                 html.Hr(style={'borderWidth': '3px'}),
                                                 html.H3("Verbeterpunten", className="card-title"),
                                                 html.Div(id='text-output'),
                                             ]
-                                        # )
-                                    # ]
-                                # ),
-                                # md=12,
                             ),
                         ]),
                     ],
@@ -136,12 +116,11 @@ app.layout = dbc.Container(
                     align='start',
                 ),
             ],
-            align="center", style={'margin-bottom': '20px', 
-                                #    'font-size': '20px'
-                                   },
+            align="center", style={'margin-bottom': '20px', 'font-size': '20px'},
         ),
     ],
     fluid=True,
+    style={'zoom': 0.8}
 )
 
 # Update the update_chart function to use your DataFrame
