@@ -13,40 +13,51 @@ import plotly.graph_objs as go
 from dash import Input, Output, dcc, html
 from sklearn import datasets
 from sklearn.cluster import KMeans
+import plotly as px
 
+print(px.colors.qualitative.Set3)
 
 # Replace the existing dataset and related code with your data
 data = {
-    'Main_Category': ['Category A', 'Category A', 'Category A', 'Category A',
-                      'Category B', 'Category B', 'Category B', 'Category B',
-                      'Category C', 'Category C', 'Category C', 'Category C',
-                      'Category D', 'Category D', 'Category D', 'Category D',
-                      'Category E', 'Category E', 'Category E', 'Category E',
-                      'Category F', 'Category F', 'Category F', 'Category F'],
-    'Sub_Category': ['Subcategory 1', 'Subcategory 2', 'Subcategory 3', 'Subcategory 4',
-                     'Subcategory 5', 'Subcategory 6', 'Subcategory 7', 'Subcategory 8',
-                     'Subcategory 9', 'Subcategory 10', 'Subcategory 11', 'Subcategory 12',
-                     'Subcategory 13', 'Subcategory 14', 'Subcategory 15', 'Subcategory 16',
-                     'Subcategory 17', 'Subcategory 18', 'Subcategory 19', 'Subcategory 20',
-                     'Subcategory 21', 'Subcategory 22', 'Subcategory 23', 'Subcategory 24'],
-    'Rank': [8, 5, 7, 9, 4, 6, 3, 8, 2, 7, 6, 9, 1, 3, 5, 7, 2, 6, 8, 4, 1, 9, 4, 6]
+    'Main_Category': ['Talent',
+                      'Mentaliteit', 'Mentaliteit', 'Mentaliteit',
+                      'Opleiding', 'Opleiding',
+                      'Familie', 'Familie'],
+    'Sub_Category': ['Talent',
+                     'Motivatie', 'Tactiek', 'Wedstrijdspanning/concentratie',
+                     'Opleidingsniveau', 'Vertrouwensband trainer en speler',
+                     'Financiën', 'Steun en thuissituatie'],
+    'Rank': [9, 8.9, 8.2, 7, 8.2, 8.5, 8.4, 8]
 }
 
 # Define colors for main categories
-main_category_colors = ['blue', 'green', 'red', 'purple', 'orange']
-main_categories = ['Category A', 'Category B', 'Category C', 'Category D', 'Category E']
-subcategories = [f'Subcategory {i+1}' for i in range(15)]
+main_category_colors = ['red', 'green', 'purple', 'orange']
+main_categories = ['Talent', 'Mentaliteit', 'Opleiding', 'Familie']
+# subcategories = [f'Subcategory {i+1}' for i in range(15)]
 
-# Predefined values for 5 main categories, each with 3 subcategories
-predefined_values = {f'Subcategory {i+1}': 5 for i in range(15)}
+# # Predefined values for 5 main categories, each with 3 subcategories
+# predefined_values = {f'Subcategory {i+1}': 5 for i in range(15)}
+# predefined_values_list = [predefined_values[subcategory] for subcategory in subcategories]
+
+# Create subcategories list and corresponding ranks
+subcategories = data['Sub_Category']
+ranks = data['Rank']
+
+# Replace the existing dataset and related code with your data
+predefined_values = {subcategory: rank for subcategory, rank in zip(subcategories, ranks)}
 predefined_values_list = [predefined_values[subcategory] for subcategory in subcategories]
+
+# Print the result
+print(predefined_values)
+print(predefined_values_list)
 
 # Convert your data to a DataFrame
 df = pd.DataFrame(data)
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
+
 app = dash.Dash(
-    title="SuccesFactorsTennis",
+    title="SuccesFactorenTennis",
     external_stylesheets=[dbc.themes.BOOTSTRAP, 'https://codepen.io/chriddyp/pen/bWLwgP.css'],
     )
 
@@ -57,45 +68,67 @@ controls = dbc.Card(
     [
         html.Div(
             [
-                html.Label("Subcategories"),
+                html.H2('Subcategorieën', style={'textAlign': 'center'}),
+                html.Hr(style={'borderWidth': '3px'}),
+                html.Label("Hoe sterk ben je in deze onderdelen? Selecteer een waarde tussen de 1-10"),
+                html.Hr(style={'borderWidth': '3px'}),
                 *[html.Div(
                     [
                         dbc.Label(f"{subcategory}"),
-                        dbc.Input(id=f"{subcategory.lower()}-cluster-count", type="number", value=3),
-                    ]
+                        # dbc.Input(id=f"{subcategory.lower()}", type="number", value=3),
+                        html.Div(
+                        dcc.Slider(min=1, max=10, step=1, value=1, id=f"{subcategory.lower()}"),
+                        style={'padding-bottom': '15px'},
+                        ),
+                    ],
                 ) for subcategory in subcategories],
-                html.Button('Go', id='go-button', n_clicks=0)
+                html.Button('Indienen', id='go-button', n_clicks=0, style={'margin-top': '25px'})
             ]
         ),
     ],
     body=True,
+    style={
+        'position': 'fixed',
+        'top': 0,
+        'left': 0,
+        'bottom': 0,
+        'width': '20%',
+        'padding': '20px 10px',
+        'background-color': '#f8f9fa',
+        'width': '20%',
+        'font-size': '20px',
+        'overflowY': 'scroll', 
+        # 'maxHeight': '1250px',
+    },
 )
+
 app.layout = dbc.Container(
     [
-        html.H1("Succesfactoren tennis test"),
-        html.Hr(),
         dbc.Row(
              [
-                dbc.Col(controls, md=4, align='start', style={'overflow-y': 'scroll', 'max-height': '1000px', 'scrollbar-width': 'thin', 'scrollbar-color': 'darkgrey lightgrey',},
+                dbc.Col(controls, md=3, align='start', style={'overflowY': 'scroll',},
                 ),      
                 dbc.Col(
                     [
+                        html.H2('Succesfactoren Tennis', style={'textAlign': 'center', 'marginTop': '49px', 'backgroundColor': 'white'}),
+                        html.Hr(style={'borderWidth': '3px', 'position': 'sticky', 'top': 0, 'zIndex': 1000}),
                         dbc.Row([
                             dbc.Col(dcc.Graph(id="bar-chart"), md=12),
                         ]),
                         dbc.Row([
                             dbc.Col(
-                                dbc.Card(
-                                    [
-                                        dbc.CardBody(
+                                # dbc.Card(
+                                    # [
+                                        # dbc.CardBody(
                                             [
-                                                html.H4("Text Output", className="card-title"),
+                                                html.Hr(style={'borderWidth': '3px'}),
+                                                html.H3("Verbeterpunten", className="card-title"),
                                                 html.Div(id='text-output'),
                                             ]
-                                        )
-                                    ]
-                                ),
-                                md=12,
+                                        # )
+                                    # ]
+                                # ),
+                                # md=12,
                             ),
                         ]),
                     ],
@@ -103,49 +136,65 @@ app.layout = dbc.Container(
                     align='start',
                 ),
             ],
-            align="center", style={'margin-bottom': '20px'},
+            align="center", style={'margin-bottom': '20px', 'font-size': '20px'},
         ),
     ],
     fluid=True,
 )
 
-
 # Update the update_chart function to use your DataFrame
 @app.callback(
     Output('bar-chart', 'figure'),
     [Input('go-button', 'n_clicks')],
-    [dash.dependencies.State(f'subcategory {i+1}-cluster-count', 'value') for i in range(15)]
+    [dash.dependencies.State(f'{subcategory.lower()}', 'value') for subcategory in subcategories]
+
 )
 def update_chart(n_clicks, *user_data):
     if n_clicks > 0 and all(value is not None for value in user_data):
         
-        color = ["red", "red", "red", "green", "green", "green", "orange", "orange", "orange", "yellow", "yellow", "yellow", "purple", "purple", "purple", 
-         "blue", "blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue"]
+        # Define colors for legend based on main categories
+        legend_colors = {'Talent': '#FFA15A', 'Mentaliteit': '#EF553B', 'Opleiding': '#00CC96', 'Familie': '#AB63FA'}
+
+        colors = ["#FFA15A", "#EF553B", "#EF553B", "#EF553B", "#00CC96", "#00CC96", "#AB63FA", "#AB63FA", 
+         "#636EFA", "#636EFA","#636EFA","#636EFA","#636EFA","#636EFA","#636EFA","#636EFA"]
+
         user_values = list(user_data)
 
         # Create DataFrame with user and predefined data
         df = pd.DataFrame({
-            'Main Category': main_categories * 6,
+            'Main Category': main_categories * 4,
             'Subcategory': subcategories * 2,
             'Value': user_values + predefined_values_list,
             'Type': ['User'] * len(user_values) + ['Predefined'] * len(predefined_values),
-            'Color': color
+            'Color': colors
         })
 
         # Create separate traces for 'User' and 'Predefined'
         traces = []
-        for typ, color in zip(['User', 'Predefined'], [main_category_colors[0], 'blue']):
+        for typ, color in zip(['User', 'Predefined'], [main_category_colors[0], '#636EFA']):
             sub_df = df[df['Type'] == typ]
-            traces.append(go.Bar(x=sub_df['Subcategory'], y=sub_df['Value'], name=typ, marker_color=sub_df['Color']))
+            traces.append(go.Bar(x=sub_df['Subcategory'], y=sub_df['Value'], name=typ, marker_color=sub_df['Color'], showlegend=False,  text=sub_df['Value'],  # Display rank values as text above each bar
+                textposition='auto',))
 
         fig = go.Figure(data=traces)
+
+        # Add legend to the chart with legend groups for each main category
+        for main_category, color in legend_colors.items():
+            fig.add_trace(go.Scatter(x=[None], y=[None], mode='markers', marker=dict(color=color, symbol='square'), showlegend=True,
+                                     name=main_category))
 
         fig.update_layout(
             barmode='group',
             xaxis=dict(tickmode='array', tickvals=subcategories, ticktext=subcategories),
-            title='Category Rankings Comparison',
-            xaxis_title='Subcategory',
-            yaxis_title='Ranking'
+            title='Vergelijking subcategorieën drempelwaarde',
+            xaxis_title='Subcategorie',
+            yaxis_title='Score'
+        )
+        fig.update_layout(
+            title_font_size=24,
+            xaxis=dict(tickfont=dict(size=14)),
+            yaxis=dict(tickfont=dict(size=14)),
+            legend=dict(title_font=dict(size=16), font=dict(size=14)),
         )
 
         return fig
@@ -153,10 +202,23 @@ def update_chart(n_clicks, *user_data):
         # If the button is not clicked or any field is not filled, return an empty chart
         return {'data': [], 'layout': {}}
 
+
+# Define texts for each subcategory
+subcategory_texts = {
+    'Talent': 'Snelle vezels in je spieren op jonge leeftijd ontwikkelen zodat je dat talent benut. Een fysieke trainer hebben is hiervoor belangrijk. Verder heb je talent of je hebt het niet.',
+    'Motivatie': 'Plezier behouden, progressie boeken, wedstrijd winnen, sociale contacten in het tennis behouden.',
+    'Tactiek': 'Veel wedstrijden spelen om tennis-tactisch te verbeteren. Daarnaast trainen op vaste patronen in de rally.',
+    'Wedstrijdspanning/concentratie': 'Leg de focus op HOE je de wedstrijd wil winnen en niet dat je de wedstrijd MOET winnen',
+    'Opleidingsniveau': 'Zoek uit op welk vlak jij extra hulp nodig hebt: technisch/tactisch/fysiek. Zoek hiervoor de juiste mensen',
+    'Vertrouwensband trainer en speler': 'Wees eerlijk, zorg voor transparantie tussen de ouders, spelers en trainers.',
+    'Financiën': 'Probeer sponsoren te zoeken. Het blijkt dat de invloed niet heel groot is, maar toch kan dit helpen.',
+    'Steun en thuissituatie': 'Laat als speler zien dat je ervooro wilt gaan. Ouders hebben er dan ook meer voor over. Daarnaast moeten ouders goed onderzoeken en leren way een speler nodig heeft van de ouders. Hier zijn lessen voor beschikbaar.',
+}
+
 @app.callback(
     Output('text-output', 'children'),
     [Input('go-button', 'n_clicks')],
-    [dash.dependencies.State(f'subcategory {i+1}-cluster-count', 'value') for i in range(15)]
+    [dash.dependencies.State(f'{subcategory.lower()}', 'value') for subcategory in subcategories]
 )
 def update_text(n_clicks, *user_data):
     if n_clicks > 0 and all(value is not None for value in user_data):
@@ -165,15 +227,37 @@ def update_text(n_clicks, *user_data):
         
         if smaller_subcategories:
             text_output = html.Div([
-                html.H4("Subcategories with Values Smaller than Predefined", className="card-title"),
-                html.Ul([html.Li(subcategory) for subcategory in smaller_subcategories])
+                html.H4("Bij de volgende categorieën heb je onder de drempelwaarde gescoord: ", className="card-title"),
+                html.Ul([
+                    html.Li([html.B(subcategory), f": {subcategory_texts[subcategory]}" ]) for subcategory in smaller_subcategories
+                ]),
+                html.Hr(),
+                html.H4("Showstoppers: "),
+                html.Ul([
+                    html.Li("Het plezier verliezen in de sport."),
+                    html.Li("Een slechte instelling hebben, je moet het willen."),
+                    html.Li("Slechte ondersteuning van ouders."),
+                    html.Li("Te weinig financien hebben voor de sport."),
+                    html.Li("Een ongezonde levensstijl hebben waarbij slecht eten, te weinig slaap en alcohol centraal staat.")
+                ]),
             ])
         else:
-            text_output = html.Div("All values are equal or greater than the predefined values.")
+            text_output = html.Div([
+                html.H4("Alle categorieen zijn op goed niveau!"),
+                html.Hr(),
+                html.H4("Showstoppers: "),
+                html.Ul([
+                    html.Li("Het plezier verliezen in de sport."),
+                    html.Li("Een slechte instelling hebben, je moet het willen."),
+                    html.Li("Slechte ondersteuning van ouders."),
+                    html.Li("Te weinig financien hebben voor de sport."),
+                    html.Li("Een ongezonde levensstijl hebben waarbij slecht eten, te weinig slaap en alcohol centraal staat.")
+                ]),
+                ])
         
         return text_output
     else:
-        return ''
+        return html.Div("Vul de subcategorie velden in om je resultaten te zien.")
 
     
 if __name__ == "__main__":
